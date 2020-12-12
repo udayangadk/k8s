@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-web
+  namespace: tis-uat  
+data:
+  web: |
+      
+      server {
+          listen 80;
+          server_name tis-umm.misynergy.com;
+      
+          access_log            /var/log/nginx/ww.access.log;
+          
+          location / {            
+      
+            proxy_set_header        Host $host;
+            proxy_set_header        X-Real-IP $remote_addr;
+            proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header        X-Forwarded-Proto $scheme;
+      
+            proxy_pass          http://umm-service:8080;
+            proxy_read_timeout  90;
+          }
+      }
+      
+      server {
+          listen 80;
+          server_name tis-umm-admin.misynergy.com;        
+      
+          access_log            /var/log/nginx/ww.access.log;
+          
+          location / {     
+            proxy_set_header        Host $host;
+            proxy_set_header        X-Real-IP $remote_addr;
+            proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header        X-Forwarded-Proto $scheme;
+      
+            proxy_pass          http://umm-client-service:80;
+            proxy_read_timeout  90;
+          }
+      }      
+
+      server {
+          listen 80;
+          server_name tis-ui.misynergy.com;        
+      
+          access_log            /var/log/nginx/ww.access.log;
+          
+          location / {
+              root   /usr/share/nginx/html/;
+              index  index.html index.htm;
+              try_files $uri /index.html;
+          }
+      } 
+
+      server {
+          listen 80;
+          server_name tis-gateway.misynergy.com;        
+      
+          access_log            /var/log/nginx/ww.access.log;
+          
+          location / {        
+            proxy_set_header        Host $host;
+            proxy_set_header        X-Real-IP $remote_addr;
+            proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header        X-Forwarded-Proto $scheme;
+      
+            proxy_pass          http://gateway-service:8080;
+            proxy_read_timeout  90;
+          }
+      } 

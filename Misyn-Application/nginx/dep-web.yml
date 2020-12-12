@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: tis-uat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: registry.misynergy.com/tis/admin-web-portal:0.0.0.13
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: nginx-conf
+            subPath: nginx.conf
+          - mountPath: /etc/nginx/conf.d/default.conf
+            name: nginx-web
+            subPath: web
+      imagePullSecrets:
+      - name: misynregcred                           
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
+        - name: nginx-web
+          configMap:
+            name: nginx-web
